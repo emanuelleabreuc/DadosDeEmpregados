@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Microsoft.Data.SqlClient;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,9 +17,25 @@ namespace BDWpfApp1Empregado
     /// </summary>
     public partial class MainWindow : Window
     {
+        SqlConnection? conexao = null;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            string URL = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DBEmpregadoGUI;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
+
+            try
+            {
+                conexao = new(URL);
+                conexao.Open();
+                LabelStatus.Content = "Conexão OK";
+            }
+            catch (Exception e)
+            {
+                LabelStatus.Content = "Conexão NOT";
+                Console.WriteLine(e.Message);
+            }
         }
     }
 }
