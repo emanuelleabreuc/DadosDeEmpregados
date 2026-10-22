@@ -37,5 +37,38 @@ namespace BDWpfApp1Empregado
                 Console.WriteLine(e.Message);
             }
         }
+
+        private void ButtonSalvar_Click(object sender, RoutedEventArgs e)
+        {
+            Empregado emp =  new()
+            {
+                CPF = TextBoxCPF.Text,
+                Nome = TextBoxNome.Text,
+                Endereco = TextBoxEndereco.Text
+            };
+            if (conexao != null && VerificarCampos())
+            {
+                emp.Salvar(conexao);
+                LabelStatus.Content = "Salvo OK";
+                LimparCampos();
+            }
+            else
+            {
+                LabelStatus.Content = "Erro ao salvar";
+            }
+    }
+        private bool VerificarCampos()
+        {
+            return TextBoxMatricula.Text == "" && // se a matricula estiver vazia, é um novo registro, então não precisa verificar
+                   TextBoxCPF.Text != "" &&
+                   TextBoxNome.Text != "" &&
+                   TextBoxEndereco.Text != "";
+        }
+
+        private void LimparCampos()
+        {
+            TextBoxMatricula.Text = ""; TextBoxCPF.Text = "";
+            TextBoxNome.Text = ""; TextBoxEndereco.Text = "";
+        }
     }
 }
