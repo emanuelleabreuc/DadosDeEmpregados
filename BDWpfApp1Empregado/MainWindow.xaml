@@ -18,7 +18,7 @@
         <TextBox x:Name="TextBoxEndereco" HorizontalAlignment="Left" Height="41" Margin="127,215,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" RenderTransformOrigin="0.514,0.909"/>
         <Border BorderBrush="Black" BorderThickness="1" CornerRadius="5" Padding="5" Margin="0,94,31,0" Height="162" VerticalAlignment="Top" HorizontalAlignment="Right" Width="162">
             <StackPanel Height="150" VerticalAlignment="Top">
-                <Button x:Name="ButtonPesquisar" Content="Pesquisar" Height="30" Margin="0,0,0,5"/>
+                <Button x:Name="ButtonPesquisar" Content="Pesquisar" Height="30" Margin="0,0,0,5" Click="ButtonPesquisar_Click"/>
                 <Button x:Name="ButtonSalvar" Content="Salvar" Height="30" Margin="0,0,0,5" Click="ButtonSalvar_Click"/>
                 <Button x:Name="ButtonExcluir" Content="Excluir" Height="30" Margin="0,0,0,5"/>
                 <Button x:Name="ButtonLimpar" Content="Limpar" Height="30"/>
