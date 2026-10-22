@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -19,16 +20,33 @@ namespace BDWpfApp1Empregado
             Endereco = endereco;
         }
 
-        // 🟪 Bloco roxo de baixo: ToString
+
         public override string? ToString()
         {
-            //return base.ToString();
+
             return $"Empregado -> Matricula: {Matricula} | CPF: {CPF}" +
                    $"Nome: {Nome} | Endereco: {Endereco}";
         }
 
-        // 🟨 Bloco amarelo: métodos (vazios por enquanto)
-        public void Salvar() { }
+
+        public void Salvar(SqlConnection conexao)
+        {
+            Console.WriteLine("Salvando empregado...");
+            if (Matricula == 0)
+            {
+                var Cmd = conexao.CreateCommand();
+                Cmd.CommandText = "INSERT INTO Empregado (CPF, Nome, Endereco) VALUES (@CPF, @Nome, @Endereco)";
+
+                Cmd.Parameters.Add(new SqlParameter("cpf", CPF));
+                Cmd.Parameters.Add(new SqlParameter("nome", Nome));
+                Cmd.Parameters.Add(new SqlParameter("endereco", Endereco));
+
+                Cmd.ExecuteNonQuery();
+            }
+
+
+
+        }
 
         public void Pesquisar() { }
 
