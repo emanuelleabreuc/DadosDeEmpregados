@@ -124,5 +124,31 @@ namespace BDWpfApp1Empregado
 
             LimparCampos();
         }
+
+        private void ButtonExcluir_Click(object sender, RoutedEventArgs e)
+        {
+            if (conexao != null && TextBoxMatricula.Text != "")
+            {
+                Empregado emp = new()
+                {
+                    Matricula = int.Parse(TextBoxMatricula.Text)
+                };
+                emp.Excluir();
+                LabelStatus.Content = "Excluído com sucesso";
+                LimparCampos();
+                List<Empregado>? ret = emp.Pesquisar(0, conexao);
+                if (ret != null)
+                {
+                    objClasseListDataGridEmpregado = new(ret);
+                    DataGridEmpregadoList.ItemsSource = objClasseListDataGridEmpregado;
+                }
+            }
+            else
+            {
+                LabelStatus.Content = "Erro ao excluir";
+            }
         }
+    }
+
+
     }
