@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BDWpfApp1Empregado"
         mc:Ignorable="d"
-        Title="MainWindow" Height="396" Width="616">
-    <Grid Margin="0,0,107,109">
+        Title="Dados do Empregado" Height="500" Width="616" Closing="Window_Closing">
+    <Grid Margin="0,0,0,10">
         <Label Content="Dados do Empregado" HorizontalAlignment="Left" Margin="21,10,0,0" VerticalAlignment="Top" FontSize="24" FontWeight="Bold" Height="52" Width="266"/>
         <Label Content="Matricula" HorizontalAlignment="Left" Margin="21,88,0,0" VerticalAlignment="Top" Height="36" Width="78" FontSize="16" RenderTransformOrigin="0.506,1.062"/>
         <Label Content="CPF" HorizontalAlignment="Left" Margin="21,129,0,0" VerticalAlignment="Top" Height="30" Width="59" FontSize="16"/>
@@ -21,10 +21,10 @@
                 <Button x:Name="ButtonPesquisar" Content="Pesquisar" Height="30" Margin="0,0,0,5" Click="ButtonPesquisar_Click"/>
                 <Button x:Name="ButtonSalvar" Content="Salvar" Height="30" Margin="0,0,0,5" Click="ButtonSalvar_Click"/>
                 <Button x:Name="ButtonExcluir" Content="Excluir" Height="30" Margin="0,0,0,5"/>
-                <Button x:Name="ButtonLimpar" Content="Limpar" Height="30"/>
+                <Button x:Name="ButtonLimpar" Content="Limpar" Height="30" Click="ButtonLimpar_Click"/>
             </StackPanel>
         </Border>
-        <DataGrid x:Name="DataGridEmpregadoList" Margin="2,274,-2,-73" ColumnWidth="*" CanUserAddRows="False"/>
+        <DataGrid x:Name="DataGridEmpregadoList" Margin="10,274,10,10" ColumnWidth="*" CanUserAddRows="False" IsReadOnly="True"/>
         <Label x:Name="LabelStatus" Content="Status" HorizontalAlignment="Left" Margin="340,19,0,0" VerticalAlignment="Top" Width="115" Height="33" FontSize="16"/>
     </Grid>
 </Window>
