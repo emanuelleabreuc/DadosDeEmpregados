@@ -6,7 +6,7 @@ using System.Text;
 
 namespace BDWpfApp1Empregado
 {
-    class Empregado
+    public class Empregado
     {
         public int Matricula { get; set; } = 0;
         public string? Nome { get; set; }
@@ -25,22 +25,21 @@ namespace BDWpfApp1Empregado
         public override string? ToString()
         {
 
-            return $"Empregado -> Matricula: {Matricula} | CPF: {CPF}" +
+            return $"Empregado -> Matricula: {Matricula} | CPF: {CPF} | " +
                    $"Nome: {Nome} | Endereco: {Endereco}";
         }
 
 
         public void Salvar(SqlConnection conexao)
         {
-            Console.WriteLine("Salvando empregado...");
             if (Matricula == 0)
             {
-                var Cmd = conexao.CreateCommand();
+                using var Cmd = conexao.CreateCommand();
                 Cmd.CommandText = "INSERT INTO Empregado (CPF, Nome, Endereco) VALUES (@CPF, @Nome, @Endereco)";
 
-                Cmd.Parameters.Add(new SqlParameter("cpf", CPF));
-                Cmd.Parameters.Add(new SqlParameter("nome", Nome));
-                Cmd.Parameters.Add(new SqlParameter("endereco", Endereco));
+                Cmd.Parameters.Add(new SqlParameter("@CPF", CPF));
+                Cmd.Parameters.Add(new SqlParameter("@Nome", Nome));
+                Cmd.Parameters.Add(new SqlParameter("@Endereco", Endereco));
 
                 Cmd.ExecuteNonQuery();
             }
@@ -51,11 +50,9 @@ namespace BDWpfApp1Empregado
 
         public List<Empregado>? Pesquisar(int matriculaParam, SqlConnection conexao)
         {
-            Console.WriteLine("== Recuperando Empregado ==");
-
             List<Empregado>? EmpregadoSLido = null;
 
-            var Cmd = conexao.CreateCommand();
+            using var Cmd = conexao.CreateCommand();
 
             if(matriculaParam == 0)
             {
@@ -63,32 +60,35 @@ namespace BDWpfApp1Empregado
             }
             else
             {
-                Cmd.CommandText = "SELECT * FROM Empregado WHERE matricula = @matriculaBusca";
-                Cmd.Parameters.Add(new SqlParameter("matriculaBusca", matriculaParam));
+                Cmd.CommandText = "SELECT * FROM Empregado WHERE Matricula = @matriculaBusca";
+                Cmd.Parameters.Add(new SqlParameter("@matriculaBusca", matriculaParam));
             }
-            var resultado = Cmd.ExecuteReader();
+            // o using fecha o reader mesmo se der erro no meio da leitura
+            using var resultado = Cmd.ExecuteReader();
 
-            if (resultado != null)
+            EmpregadoSLido = new();
+
+            while (resultado.Read())
             {
-                EmpregadoSLido = new();
-
-                while (resultado.Read())
+                Empregado EmpregadoLido = new()
                 {
-                    Empregado EmpregadoLido = new()
-                    {
-                        Matricula = resultado.GetInt32("Matricula"),
-                        CPF = resultado.GetString("CPF"),
-                        Nome = resultado.GetString("Nome"),
-                        Endereco = resultado.GetString("Endereco")
-                    };
+                    Matricula = resultado.GetInt32("Matricula"),
+                    CPF = LerTexto(resultado, "CPF"),
+                    Nome = LerTexto(resultado, "Nome"),
+                    Endereco = LerTexto(resultado, "Endereco")
+                };
 
-                    EmpregadoSLido.Add(EmpregadoLido);
-                }
-
-                resultado.Close();
+                EmpregadoSLido.Add(EmpregadoLido);
             }
 
             return EmpregadoSLido;
+        }
+
+        // as colunas aceitam NULL, e GetString lanca excecao nesse caso
+        private static string? LerTexto(SqlDataReader leitor, string coluna)
+        {
+            int indice = leitor.GetOrdinal(coluna);
+            return leitor.IsDBNull(indice) ? null : leitor.GetString(indice);
         }
 
         
