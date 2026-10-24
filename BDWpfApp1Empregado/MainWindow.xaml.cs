@@ -54,17 +54,17 @@ namespace BDWpfApp1Empregado
             };
             if (conexao != null && VerificarCampos())
             {
-                try
+                emp.Salvar(conexao);
+                LabelStatus.Content = "Salvo com sucesso";
+                LimparCampos();
+
+                List<Empregado>? ret = emp.Pesquisar(0, conexao);
+                if (ret != null)
                 {
-                    emp.Salvar(conexao);
-                    LabelStatus.Content = "Salvo OK";
-                    LimparCampos();
+                    objClasseListDataGridEmpregado = new(ret);
+                    DataGridEmpregadoList.ItemsSource = objClasseListDataGridEmpregado;
                 }
-                catch (SqlException ex)
-                {
-                    LabelStatus.Content = "Erro ao salvar";
-                    Console.WriteLine(ex.Message);
-                }
+            
             }
             else
             {
