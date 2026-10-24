@@ -148,6 +148,49 @@ namespace BDWpfApp1Empregado
             LimparCampos();
         }
 
+        private void ButtonExcluir_Click(object sender, RoutedEventArgs e)
+        {
+            if (conexao == null)
+            {
+                LabelStatus.Content = "Sem conexão";
+                return;
+            }
+            if (!int.TryParse(TextBoxMatricula.Text, out int matricula))
+            {
+                LabelStatus.Content = "Matrícula inválida";
+                return;
+            }
+            if (MessageBox.Show($"Excluir a matrícula {matricula}?", "Confirmar",
+                                MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                Empregado emp = new() { Matricula = matricula };
+
+                if (emp.Excluir(conexao) == 0)
+                {
+                    LabelStatus.Content = "Não encontrado";
+                    return;
+                }
+
+                LabelStatus.Content = "Excluído com sucesso";
+                LimparCampos();
+
+                List<Empregado>? ret = emp.Pesquisar(0, conexao);
+                if (ret != null)
+                {
+                    objClasseListDataGridEmpregado = new(ret);
+                    DataGridEmpregadoList.ItemsSource = objClasseListDataGridEmpregado;
+                }
+            }
+            catch (Exception ex)
+            {
+                LabelStatus.Content = "Erro ao excluir";
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
         private void ButtonLimpar_Click(object sender, RoutedEventArgs e)
         {
             LimparCampos();
@@ -160,3 +203,4 @@ namespace BDWpfApp1Empregado
         }
     }
 }
+
