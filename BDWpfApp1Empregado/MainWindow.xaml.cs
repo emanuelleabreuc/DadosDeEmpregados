@@ -1,15 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
-using System.Text;
-using System.Windows;
 using System.ComponentModel;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Diagnostics;
+using System.Windows;
 
 namespace BDWpfApp1Empregado
 {
@@ -39,8 +31,11 @@ namespace BDWpfApp1Empregado
             }
             catch (Exception e)
             {
+                // a conexao foi criada mas nao abriu, entao nao pode ser usada
+                conexao?.Dispose();
+                conexao = null;
                 LabelStatus.Content = "Conexão NOT";
-                Console.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
             }
         }
 
@@ -52,7 +47,23 @@ namespace BDWpfApp1Empregado
                 Nome = TextBoxNome.Text,
                 Endereco = TextBoxEndereco.Text
             };
-            if (conexao != null && VerificarCampos())
+            if (conexao == null)
+            {
+                LabelStatus.Content = "Sem conexão";
+                return;
+            }
+            if (TextBoxMatricula.Text != "")
+            {
+                LabelStatus.Content = "Limpe a matrícula";
+                return;
+            }
+            if (!VerificarCampos())
+            {
+                LabelStatus.Content = "Preencha os campos";
+                return;
+            }
+
+            try
             {
                 emp.Salvar(conexao);
                 LabelStatus.Content = "Salvo com sucesso";
@@ -64,11 +75,11 @@ namespace BDWpfApp1Empregado
                     objClasseListDataGridEmpregado = new(ret);
                     DataGridEmpregadoList.ItemsSource = objClasseListDataGridEmpregado;
                 }
-            
             }
-            else
+            catch (Exception ex)
             {
                 LabelStatus.Content = "Erro ao salvar";
+                Debug.WriteLine(ex.Message);
             }
         }
 
@@ -88,8 +99,7 @@ namespace BDWpfApp1Empregado
 
         private bool VerificarCampos()
         {
-            return TextBoxMatricula.Text == "" && // se a matricula estiver vazia, é um novo registro, então não precisa verificar
-                   TextBoxCPF.Text != "" &&
+            return TextBoxCPF.Text != "" &&
                    TextBoxNome.Text != "" &&
                    TextBoxEndereco.Text != "";
         }
@@ -104,22 +114,35 @@ namespace BDWpfApp1Empregado
         {
             Empregado emp = new();
 
-            List<Empregado>? ret = null;
-
-            if (conexao != null)
+            if (conexao == null)
             {
-                if (TextBoxMatricula.Text == "")
-                    ret = emp.Pesquisar(0, conexao);
-                else
-                    ret = emp.Pesquisar(int.Parse(TextBoxMatricula.Text), conexao);
+                LabelStatus.Content = "Sem conexão";
+                return;
             }
 
-            if (ret != null)
+            int matricula = 0;
+            if (TextBoxMatricula.Text != "" && !int.TryParse(TextBoxMatricula.Text, out matricula))
             {
-                LabelStatus.Content = "Pesquisa OK";
+                LabelStatus.Content = "Matrícula inválida";
+                return;
+            }
 
-                objClasseListDataGridEmpregado = new(ret);
-                DataGridEmpregadoList.ItemsSource = objClasseListDataGridEmpregado;
+            try
+            {
+                List<Empregado>? ret = emp.Pesquisar(matricula, conexao);
+
+                if (ret != null)
+                {
+                    LabelStatus.Content = "Pesquisa OK";
+
+                    objClasseListDataGridEmpregado = new(ret);
+                    DataGridEmpregadoList.ItemsSource = objClasseListDataGridEmpregado;
+                }
+            }
+            catch (Exception ex)
+            {
+                LabelStatus.Content = "Erro na pesquisa";
+                Debug.WriteLine(ex.Message);
             }
 
             LimparCampos();
@@ -127,15 +150,33 @@ namespace BDWpfApp1Empregado
 
         private void ButtonExcluir_Click(object sender, RoutedEventArgs e)
         {
-            if (conexao != null && TextBoxMatricula.Text != "")
+            if (conexao == null)
             {
-                Empregado emp = new()
+                LabelStatus.Content = "Sem conexão";
+                return;
+            }
+            if (!int.TryParse(TextBoxMatricula.Text, out int matricula))
+            {
+                LabelStatus.Content = "Matrícula inválida";
+                return;
+            }
+            if (MessageBox.Show($"Excluir a matrícula {matricula}?", "Confirmar",
+                                MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                Empregado emp = new() { Matricula = matricula };
+
+                if (emp.Excluir(conexao) == 0)
                 {
-                    Matricula = int.Parse(TextBoxMatricula.Text)
-                };
-                emp.Excluir();
+                    LabelStatus.Content = "Não encontrado";
+                    return;
+                }
+
                 LabelStatus.Content = "Excluído com sucesso";
                 LimparCampos();
+
                 List<Empregado>? ret = emp.Pesquisar(0, conexao);
                 if (ret != null)
                 {
@@ -143,12 +184,23 @@ namespace BDWpfApp1Empregado
                     DataGridEmpregadoList.ItemsSource = objClasseListDataGridEmpregado;
                 }
             }
-            else
+            catch (Exception ex)
             {
                 LabelStatus.Content = "Erro ao excluir";
+                Debug.WriteLine(ex.Message);
             }
         }
-    }
 
+        private void ButtonLimpar_Click(object sender, RoutedEventArgs e)
+        {
+            LimparCampos();
+            LabelStatus.Content = "Status";
+        }
 
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            conexao?.Dispose();
+        }
     }
+}
+
