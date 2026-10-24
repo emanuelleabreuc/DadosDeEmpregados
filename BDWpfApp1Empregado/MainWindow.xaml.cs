@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Text;
 using System.Windows;
+using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -19,9 +20,13 @@ namespace BDWpfApp1Empregado
     {
         SqlConnection? conexao = null;
 
+        BindingList<Empregado> objClasseListDataGridEmpregado = new();
+
         public MainWindow()
         {
             InitializeComponent();
+
+            DataGridEmpregadoList.ItemsSource = objClasseListDataGridEmpregado;
 
             string URL = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DBEmpregadoGUI;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
 
@@ -49,17 +54,17 @@ namespace BDWpfApp1Empregado
             };
             if (conexao != null && VerificarCampos())
             {
-                try
+                emp.Salvar(conexao);
+                LabelStatus.Content = "Salvo com sucesso";
+                LimparCampos();
+
+                List<Empregado>? ret = emp.Pesquisar(0, conexao);
+                if (ret != null)
                 {
-                    emp.Salvar(conexao);
-                    LabelStatus.Content = "Salvo OK";
-                    LimparCampos();
+                    objClasseListDataGridEmpregado = new(ret);
+                    DataGridEmpregadoList.ItemsSource = objClasseListDataGridEmpregado;
                 }
-                catch (SqlException ex)
-                {
-                    LabelStatus.Content = "Erro ao salvar";
-                    Console.WriteLine(ex.Message);
-                }
+            
             }
             else
             {
@@ -94,5 +99,30 @@ namespace BDWpfApp1Empregado
             TextBoxMatricula.Text = ""; TextBoxCPF.Text = "";
             TextBoxNome.Text = ""; TextBoxEndereco.Text = "";
         }
+
+        private void ButtonPesquisar_Click(object sender, RoutedEventArgs e)
+        {
+            Empregado emp = new();
+
+            List<Empregado>? ret = null;
+
+            if (conexao != null)
+            {
+                if (TextBoxMatricula.Text == "")
+                    ret = emp.Pesquisar(0, conexao);
+                else
+                    ret = emp.Pesquisar(int.Parse(TextBoxMatricula.Text), conexao);
+            }
+
+            if (ret != null)
+            {
+                LabelStatus.Content = "Pesquisa OK";
+
+                objClasseListDataGridEmpregado = new(ret);
+                DataGridEmpregadoList.ItemsSource = objClasseListDataGridEmpregado;
+            }
+
+            LimparCampos();
+        }
+        }
     }
-}
