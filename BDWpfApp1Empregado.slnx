@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="BDWpfApp1Empregado/BDWpfApp1Empregado.csproj" />
+  <Project Path="BDWpfAppDept/BDWpfAppDept.csproj" />
 </Solution>
