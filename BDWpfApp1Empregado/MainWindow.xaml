@@ -20,7 +20,7 @@
             <StackPanel Height="150" VerticalAlignment="Top">
                 <Button x:Name="ButtonPesquisar" Content="Pesquisar" Height="30" Margin="0,0,0,5" Click="ButtonPesquisar_Click"/>
                 <Button x:Name="ButtonSalvar" Content="Salvar" Height="30" Margin="0,0,0,5" Click="ButtonSalvar_Click"/>
-                <Button x:Name="ButtonExcluir" Content="Excluir" Height="30" Margin="0,0,0,5"/>
+                <Button x:Name="ButtonExcluir" Content="Excluir" Height="30" Margin="0,0,0,5" Click="ButtonExcluir_Click"/>
                 <Button x:Name="ButtonLimpar" Content="Limpar" Height="30" Click="ButtonLimpar_Click"/>
             </StackPanel>
         </Border>
