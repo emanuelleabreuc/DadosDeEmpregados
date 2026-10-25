@@ -91,9 +91,16 @@ namespace BDWpfApp1Empregado
             return leitor.IsDBNull(indice) ? null : leitor.GetString(indice);
         }
 
-        
 
-        public void Excluir() { }
+
+        public int Excluir(SqlConnection conexao)
+        {
+            using var Cmd = conexao.CreateCommand();
+            Cmd.CommandText = "DELETE FROM Empregado WHERE Matricula = @Matricula";
+            Cmd.Parameters.Add(new SqlParameter("@Matricula", Matricula));
+
+            return Cmd.ExecuteNonQuery();
+        }
 
         public void Alterar() { }
     }
