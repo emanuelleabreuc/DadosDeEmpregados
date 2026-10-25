@@ -93,7 +93,15 @@ namespace BDWpfApp1Empregado
 
         
 
-        public void Excluir() { }
+        // retorna quantas linhas foram apagadas (0 = matricula nao encontrada)
+        public int Excluir(SqlConnection conexao)
+        {
+            using var Cmd = conexao.CreateCommand();
+            Cmd.CommandText = "DELETE FROM Empregado WHERE Matricula = @Matricula";
+            Cmd.Parameters.Add(new SqlParameter("@Matricula", Matricula));
+
+            return Cmd.ExecuteNonQuery();
+        }
 
         public void Alterar() { }
     }
